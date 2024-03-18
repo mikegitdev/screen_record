@@ -19,6 +19,8 @@ class FlutterScreenRecording {
     final bool start =
         await FlutterScreenRecordingPlatform.instance.startRecordScreen(
       name,
+      notificationTitle: titleNotification,
+      notificationMessage: messageNotification,
     );
 
     return start;
@@ -30,6 +32,8 @@ class FlutterScreenRecording {
     final bool start =
         await FlutterScreenRecordingPlatform.instance.startRecordScreenAndAudio(
       name,
+      notificationTitle: titleNotification ?? "",
+      notificationMessage: messageNotification ?? "",
     );
     return start;
   }
