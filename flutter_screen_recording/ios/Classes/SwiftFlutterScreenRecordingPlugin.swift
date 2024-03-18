@@ -142,41 +142,37 @@ public class SwiftFlutterScreenRecordingPlugin: NSObject, FlutterPlugin {
               switch rpSampleType {
               case RPSampleBufferType.video:
                 print("writing sample....")
-                if self.videoWriter?.status == AVAssetWriter.Status.unknown {
+                 print("writing sample....")
 
-                  if (self.videoWriter?.startWriting) != nil {
-                    print("Starting writing")
-                    self.myResult!(true)
-                    self.videoWriter?.startWriting()
-                    self.videoWriter?.startSession(
-                      atSourceTime: CMSampleBufferGetPresentationTimeStamp(cmSampleBuffer))
-                  }
+                if self.assetWriter?.status == AVAssetWriter.Status.unknown {
+
+                    print("Started writing")
+                    self.assetWriter?.startWriting()
+                    self.assetWriter?.startSession(atSourceTime: CMSampleBufferGetPresentationTimeStamp(cmSampleBuffer))
                 }
 
-                if self.videoWriter?.status == AVAssetWriter.Status.writing {
-                  if self.videoWriterInput?.isReadyForMoreMediaData == true {
-                    print("Writing a sample")
-                    if self.videoWriterInput?.append(cmSampleBuffer) == false {
-                      print(" we have a problem writing video")
-                      self.myResult!(false)
-                    }
-                  }
+                if self.assetWriter.status == AVAssetWriter.Status.failed {
+                    print("StartCapture Error Occurred, Status = \(self.assetWriter.status.rawValue), \(self.assetWriter.error!.localizedDescription) \(self.assetWriter.error.debugDescription)")
+                     return
                 }
+
+                if self.assetWriter.status == AVAssetWriter.Status.writing {
+                    if self.videoInput.isReadyForMoreMediaData {
+                        print("Writing a sample")
+                        if self.videoInput.append(cmSampleBuffer) == false {
+                             print("problem writing video")
+                        }
+                     }
+                 }
 
               case RPSampleBufferType.audioMic:
-                if self.recordAudio {
-                  if self.audioInput.isReadyForMoreMediaData {
-                    // print("audioMic data added")
-                    if self.audioInput.append(cmSampleBuffer) == false {
-                      print(" we have a problem writing audio")
-                      self.myResult!(false)
-                    }
-                  }
+                if self.audioMicInput.isReadyForMoreMediaData {
+                    print("audioMic data added")
+                    self.audioMicInput.append(cmSampleBuffer)
                 }
 
               default:
-              ();
-              // print("not a video sample, so ignore")
+                    print("not a video sample")
               }
             }
           }
